@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.NetworkInformation;
 
 namespace MeuIp
@@ -12,21 +11,28 @@ namespace MeuIp
 
         private void btnSerch_Click(object sender, EventArgs e)
         {
-            List<NetworkInterface> interfaces = NetworkInterface.GetAllNetworkInterfaces().Where(i => 
-                i.OperationalStatus == OperationalStatus.Up && 
-                i.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToList();
-
-            txtBoxResult.Text = "";
-
-            foreach (var networkInterface in interfaces)
+            try
             {
-                var oi = networkInterface.GetIPProperties().UnicastAddresses;
-                foreach (var ip in networkInterface.GetIPProperties().UnicastAddresses.Where(i => 
-                    i.Address.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork))
+                List<NetworkInterface> interfaces = NetworkInterface.GetAllNetworkInterfaces().Where(i =>
+                    i.OperationalStatus == OperationalStatus.Up &&
+                    i.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToList();
+
+                txtBoxResult.Text = "";
+
+                foreach (var networkInterface in interfaces)
                 {
-                    txtBoxResult.Text += $"{networkInterface.Name}: {ip.Address}\r";
+                    foreach (var ip in networkInterface.GetIPProperties().UnicastAddresses.Where(i =>
+                        i.Address.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork))
+                    {
+                        txtBoxResult.Text += $"{networkInterface.Name}: {ip.Address}\r";
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
         }
     }
 }
